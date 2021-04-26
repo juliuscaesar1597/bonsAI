@@ -48,7 +48,7 @@ async def on_message(message): #creates the modqueue
             toxreason= await get_tox()
             jump_url = f"[Click to see context.]({message.jump_url})"
             mess=message.content
-            chanl= client.get_channel(834778270968446976)
+            chanl= client.get_channel(834778270968446976) #change channel id to match your modqueue channel id
             toxembed=discord.Embed(title='New potentially inappropriate message:',colour = discord.Colour.red())
             name= f"{message.author.name}#{message.author.discriminator}"
             toxembed.set_author(name=name , icon_url=message.author.avatar_url)
@@ -75,14 +75,14 @@ async def get_tox():
     return typeattack
 @client.event
 async def on_raw_reaction_add(payload): #analyzes reactions for the modqueue
-    if payload.channel_id != 834778270968446976: 
+    if payload.channel_id != 834778270968446976: #change channel id to match your modqueue channel id
         return 
     if payload.user_id == client.user.id: 
         return
 
     channel = client.get_channel(payload.channel_id)
     msg = await channel.fetch_message(payload.message_id)
-    guild=631730211880435752
+    guild=631730211880435752 #change guild id to match your modqueue guild id
     embed = msg.embeds[0]
     discorduser=await client.fetch_user(payload.user_id)
 
