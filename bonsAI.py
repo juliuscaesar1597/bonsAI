@@ -40,7 +40,7 @@ async def on_ready():
     
 
 @client.event
-async def on_message(message): 
+async def on_message(message): #creates the modqueue
     if message.author == client.user:
         return
     try:
@@ -74,7 +74,7 @@ async def get_tox():
         typeattack="Identity Attack"
     return typeattack
 @client.event
-async def on_raw_reaction_add(payload):
+async def on_raw_reaction_add(payload): #analyzes reactions for the modqueue
     if payload.channel_id != 834778270968446976: 
         return 
     if payload.user_id == client.user.id: 
@@ -97,9 +97,9 @@ async def on_raw_reaction_add(payload):
         await msg.clear_reactions()
     elif payload.emoji.name == '❌':
         embedcontents=embed.fields
-        link=(embed.fields[1].value)
+        link=(embed.fields[1].value) 
         linksplit=(embed.fields[1].value).split('/')
-        orimsg_id = int(re.sub(r'[)]', '', linksplit[6]))
+        orimsg_id = int(re.sub(r'[)]', '', linksplit[6])) #uses the stored link to get the message id and channel id
         orichannel= await client.fetch_channel(int(linksplit[5]))
         originalmessage = await orichannel.fetch_message(orimsg_id)
         await originalmessage.delete()
