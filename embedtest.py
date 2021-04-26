@@ -16,8 +16,7 @@ async def on_message(message):
 client.run('ODM0NDA4ODA1MDYzNTg5OTQ5.YIAdwQ.qkhU0BtHtvLmtnjaPjM1mJ8IX8E')
 
 elif payload.emoji.name == ':x:':
-        embedcontents=msg.embed.fields
-        link=(embed.fields[1].value).split('/')
+        
         msg_id = int(link[5])
         message = await channel.fetch_message(msg_id)
         await message.delete()
