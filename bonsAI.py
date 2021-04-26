@@ -134,7 +134,7 @@ async def on_raw_reaction_add(payload): #analyzes reactions for the modqueue
         oriuser= await client.fetch_user(int(embed.fields[2].value))
         await originalmessage.delete()
         kickguild = await client.fetch_guild(guild)
-        await kickguild.kick(user=oriuser, reason=(embedcontents[0].value))
+        await kickguild.kick(user=oriuser, reason=(embed.fields[0].value))
         embed = discord.Embed(
 			title=f"Kicked by {discorduser}",
 		    colour=discord.Color.red(),
@@ -151,7 +151,7 @@ async def on_raw_reaction_add(payload): #analyzes reactions for the modqueue
         oriuser= await client.fetch_user(int(embed.fields[2].value))
         await originalmessage.delete()
         kickguild = await client.fetch_guild(guild)
-        await kickguild.ban(user=oriuser, reason=(embedcontents[0].value))
+        await kickguild.ban(user=oriuser, reason=(embed.fields[0].value))
         embed = discord.Embed(
 			title=f"Banned by {discorduser}",
 		    colour=discord.Color.red(),
