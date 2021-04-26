@@ -55,7 +55,7 @@ async def on_ready():
     
 
 @client.event
-async def on_message(message): #creates the modqueue
+async def on_message(message): #creates the modqueue embed and sends reactions
     if message.author == client.user:
         return
     try:
@@ -76,7 +76,7 @@ async def on_message(message): #creates the modqueue
             await sendembed.add_reaction("✅")
             await sendembed.add_reaction("❌")
             await sendembed.add_reaction("🦵")
-            await sendembed.add_reaction(banemoji)
+            await sendembed.add_reaction(banemoji) #this is a custom emoji, can be obtained here: https://bit.ly/3dQbi7g
     except:
         pass
 async def get_tox():
@@ -114,7 +114,7 @@ async def on_raw_reaction_add(payload): #analyzes reactions for the modqueue
         embedcontents=embed.fields
         link=(embed.fields[1].value) 
         linksplit=(embed.fields[1].value).split('/')
-        orimsg_id = int(re.sub(r'[)]', '', linksplit[6])) #uses the stored link to get the message id and channel id
+        orimsg_id = int(re.sub(r'[)]', '', linksplit[6])) #uses the stored embed link to get the message id and channel id
         orichannel= await client.fetch_channel(int(linksplit[5]))
         originalmessage = await orichannel.fetch_message(orimsg_id)
         await originalmessage.delete()
