@@ -1,18 +1,17 @@
 import discord, json, requests
 from ratelimit import limits
 import string
-from settings import API_KEY, DISCORD_TOKEN
+from settings import API_KEY, DISCORD_TOKEN, Queue_channel_ID, Queue_guild_ID
 
-#set up Discord client
 client = discord.Client()
 
-#rate limit decorator because Perspective API limits you to 1 query per second 
+#this limit is because the Perspective API only allows one request per second
 @limits(calls=1, period=1)
 def toxic_check(message):
     api_key = API_KEY
     url = ('https://commentanalyzer.googleapis.com/v1alpha1/comments:analyze' + '?key=' + api_key)
     
-#Ask Perspective to analyize for "attacks on identity." Other values such as TOXICITY can be found in their docs
+#This part send a request to analyze the discord message based on whether it contains a threat, severe toxicity or an identity attack
     data_dict = {
         'comment': {'text': message},
         'languages': ['en'],
@@ -32,7 +31,7 @@ def toxic_check(message):
     attack= max(thrattack,toxattack,ideattack)
     return attack
 
-
+#sets the status of the of bot, in this case "Playing with AI"
 @client.event
 async def on_ready():
     print('We have logged in as {0.user}'.format(client))
@@ -75,14 +74,14 @@ async def get_tox():
     return typeattack
 @client.event
 async def on_raw_reaction_add(payload):
-    if payload.channel_id != 834778270968446976: 
+    if payload.channel_id != Queue_channel_ID: 
         return 
     if payload.user_id == client.user.id: 
         return
 
     channel = client.get_channel(payload.channel_id)
     msg = await channel.fetch_message(payload.message_id)
-    guild=631730211880435752
+    guild=Queue_guild_ID
     embed = msg.embeds[0]
     discorduser=await client.fetch_user(payload.user_id)
 
