@@ -1,7 +1,8 @@
 import discord, json, requests
 from ratelimit import limits
 import string
-from settings import API_KEY, DISCORD_TOKEN, Queue_channel_ID, Queue_guild_ID
+from settings import API_KEY, DISCORD_TOKEN
+import re
 
 client = discord.Client()
 
