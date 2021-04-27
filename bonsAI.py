@@ -114,7 +114,7 @@ async def on_raw_reaction_add(payload): #analyzes reactions for the modqueue
         embedcontents=embed.fields
         link=(embed.fields[1].value) 
         linksplit=(embed.fields[1].value).split('/')
-        orimsg_id = int(re.sub(r'[)]', '', linksplit[6])) #uses the stored embed link to get the message id and channel id
+        orimsg_id = int(re.sub(r'[)]', '', linksplit[6])) #uses the stored embed link to get the message id and channel id of the message that was flagged
         orichannel= await client.fetch_channel(int(linksplit[5]))
         originalmessage = await orichannel.fetch_message(orimsg_id)
         await originalmessage.delete()
@@ -128,10 +128,10 @@ async def on_raw_reaction_add(payload): #analyzes reactions for the modqueue
         embedcontents=embed.fields
         link=(embed.fields[1].value)
         linksplit=(embed.fields[1].value).split('/')
-        orimsg_id = int(re.sub(r'[)]', '', linksplit[6]))
+        orimsg_id = int(re.sub(r'[)]', '', linksplit[6])) #uses the stored embed link to get the message id and channel id of the message that was flagged
         orichannel= await client.fetch_channel(int(linksplit[5]))
         originalmessage = await orichannel.fetch_message(orimsg_id)
-        oriuser= await client.fetch_user(int(embed.fields[2].value))
+        oriuser= await client.fetch_user(int(embed.fields[2].value)) #uses the stored embed user id to obtain the user id of the author of the flagged message
         await originalmessage.delete()
         kickguild = await client.fetch_guild(guild)
         await kickguild.kick(user=oriuser, reason=(embed.fields[0].value))
@@ -145,10 +145,10 @@ async def on_raw_reaction_add(payload): #analyzes reactions for the modqueue
         embedcontents=embed.fields
         link=(embed.fields[1].value)
         linksplit=(embed.fields[1].value).split('/')
-        orimsg_id = int(re.sub(r'[)]', '', linksplit[6]))
+        orimsg_id = int(re.sub(r'[)]', '', linksplit[6])) #uses the stored embed link to get the message id and channel id of the message that was flagged
         orichannel= await client.fetch_channel(int(linksplit[5]))
         originalmessage = await orichannel.fetch_message(orimsg_id)
-        oriuser= await client.fetch_user(int(embed.fields[2].value))
+        oriuser= await client.fetch_user(int(embed.fields[2].value)) #uses the stored embed user id to obtain the user id of the author of the flagged message
         await originalmessage.delete()
         kickguild = await client.fetch_guild(guild)
         await kickguild.ban(user=oriuser, reason=(embed.fields[0].value))
