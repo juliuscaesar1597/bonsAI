@@ -39,7 +39,7 @@ def toxic_check(message):
     response_dict = json.loads(response.content)
     global thrattack
     global toxattack
-    global toxattack
+    global ideattack
     global attack 
     thrattack = response_dict["attributeScores"]["THREAT"]["summaryScore"]["value"]
     toxattack = response_dict["attributeScores"]["SEVERE_TOXICITY"]["summaryScore"]["value"]
