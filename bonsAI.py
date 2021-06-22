@@ -13,7 +13,10 @@
 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-import discord, json, requests
+import discord, json, requests, discord_components
+from discord_components import interaction
+from discord.ext.commands import Bot
+from discord_components import DiscordComponents, Button, ButtonStyle, InteractionType, component
 from ratelimit import limits
 import string
 from settings import API_KEY, DISCORD_TOKEN
@@ -50,6 +53,7 @@ def toxic_check(message):
 #sets the status of the of bot, in this case "Playing with AI"
 @client.event
 async def on_ready():
+    DiscordComponents(client)
     print('We have logged in as {0.user}'.format(client))
     await client.change_presence(activity=discord.Game(name='with AI'))
     
@@ -71,14 +75,19 @@ async def on_message(message): #creates the modqueue embed and sends reactions
             toxembed.add_field(name = "Flagged for: ", value =toxreason)
             toxembed.add_field(name = "Context:", value =jump_url)
             toxembed.add_field(name = "User ID:", value =message.author.id)
-            sendembed = await chanl.send(embed=toxembed)
-            banemoji = '<:BAN:835119271846871060>'
-            await sendembed.add_reaction("✅")
-            await sendembed.add_reaction("❌")
-            await sendembed.add_reaction("🦵")
-            await sendembed.add_reaction(banemoji) #this is a custom emoji, can be obtained here: https://bit.ly/3dQbi7g
+            await chanl.send(embed=toxembed)
+            await chanl.send(
+                "Please act based on whether any rules were broken",
+                components=[[
+                    Button(style=ButtonStyle.green, label = "Approve message"),
+                    Button(style=ButtonStyle.red, label = "Delete message"),
+                    Button(style=ButtonStyle.red, label = "Kick user"),
+                    Button(style=ButtonStyle.red, label = "Ban user")
+                ]]
+                )        
     except:
         pass
+
 async def get_tox():
     global typeattack
     if thrattack == attack:
@@ -88,76 +97,75 @@ async def get_tox():
     else:
         typeattack="Identity Attack"
     return typeattack
+
 @client.event
-async def on_raw_reaction_add(payload): #analyzes reactions for the modqueue
-    if payload.channel_id != 834778270968446976: #change channel id to match your modqueue channel id
-        return 
-    if payload.user_id == client.user.id: 
+async def on_button_click(interaction):
+    if interaction.responded:
         return
+    await interaction.respond(content = "Not Implemented")
 
-    channel = client.get_channel(payload.channel_id)
-    msg = await channel.fetch_message(payload.message_id)
-    guild=631730211880435752 #change guild id to match your modqueue guild id
-    embed = msg.embeds[0]
-    discorduser=await client.fetch_user(payload.user_id)
+@client.event
+async def on_button_click(interaction): #analyzes reactions for the modqueue
+    guild= await client.fetch_guild(631730211880435752) #change guild id to match your modqueue guild id
+    label = interaction.component.label
+    interactionChannel = client.get_channel(804719360404357140) 
+    interactionUser = interaction.user.id
 
-    if payload.emoji.name == '✅':
-        embedcontents=embed.fields
-        link=(embed.fields[1].value) 
+    interactionMessage = await interactionChannel.fetch_message(interaction.message.id)
+    async for message in interactionChannel.history(limit=1, before=interaction.message):
+        lastMessage= message
+    embedMessage= lastMessage.embeds[0]
+    #print(embedMessage) Debug printout
+    discorduser=await client.fetch_user(interactionUser)
+    if label.startswith("Approve message"):
+        link=embedMessage.fields[1].value 
         embed = discord.Embed(
 			title=f"Approved by {discorduser}",
 		    colour=discord.Color.green(),
             description=link)
-        await msg.edit(embed=embed)
-        await msg.clear_reactions()
-    elif payload.emoji.name == '❌':
-        embedcontents=embed.fields
-        link=(embed.fields[1].value) 
-        linksplit=(embed.fields[1].value).split('/')
-        orimsg_id = int(re.sub(r'[)]', '', linksplit[6])) #uses the stored embed link to get the message id and channel id of the message that was flagged
-        orichannel= await client.fetch_channel(int(linksplit[5]))
-        originalmessage = await orichannel.fetch_message(orimsg_id)
+        await lastMessage.edit(embed=embed)
+        await interactionMessage.delete(delay=None)
+    elif label.startswith("Delete"):
+        link=(embedMessage.fields[1].value) 
+        linkSplit=(embedMessage.fields[1].value).split('/')
+        originalEmbedID = int(re.sub(r'[)]', '', linkSplit[6])) #uses the stored embed link to get the message id and channel id of the message that was flagged
+        originalchannel= await client.fetch_channel(int(linkSplit[5]))
+        originalmessage = await originalchannel.fetch_message(originalEmbedID)
         await originalmessage.delete()
         embed = discord.Embed(
 			title=f"Deleted by {discorduser}",
 		    colour=discord.Color.red(),
             description=link)
-        await msg.edit(embed=embed)
-        await msg.clear_reactions()
-    elif payload.emoji.name == '🦵':
-        embedcontents=embed.fields
-        link=(embed.fields[1].value)
-        linksplit=(embed.fields[1].value).split('/')
-        orimsg_id = int(re.sub(r'[)]', '', linksplit[6])) #uses the stored embed link to get the message id and channel id of the message that was flagged
-        orichannel= await client.fetch_channel(int(linksplit[5]))
-        originalmessage = await orichannel.fetch_message(orimsg_id)
-        oriuser= await client.fetch_user(int(embed.fields[2].value)) #uses the stored embed user id to obtain the user id of the author of the flagged message
+        await embedMessage.edit(embed=embed)
+    elif label.startswith("Kick"):
+        link=(embedMessage.fields[1].value)
+        linkSplit=(embedMessage.fields[1].value).split('/')
+        originalEmbedID = int(re.sub(r'[)]', '', linkSplit[6])) #uses the stored embed link to get the message id and channel id of the message that was flagged
+        originalchannel= await client.fetch_channel(int(linkSplit[5]))
+        originalmessage = await originalchannel.fetch_message(originalEmbedID)
+        originalUser= await client.fetch_user(int(embedMessage.fields[2].value)) #uses the stored embed user id to obtain the user id of the author of the flagged message
         await originalmessage.delete()
-        kickguild = await client.fetch_guild(guild)
-        await kickguild.kick(user=oriuser, reason=(embed.fields[0].value))
+        await guild.kick(user=originalUser, reason=(embedMessage.fields[0].value))
         embed = discord.Embed(
 			title=f"Kicked by {discorduser}",
 		    colour=discord.Color.red(),
             description=link)
-        await msg.edit(embed=embed)
-        await msg.clear_reactions()
-    elif payload.emoji.name == 'BAN':
-        embedcontents=embed.fields
-        link=(embed.fields[1].value)
-        linksplit=(embed.fields[1].value).split('/')
-        orimsg_id = int(re.sub(r'[)]', '', linksplit[6])) #uses the stored embed link to get the message id and channel id of the message that was flagged
-        orichannel= await client.fetch_channel(int(linksplit[5]))
-        originalmessage = await orichannel.fetch_message(orimsg_id)
-        oriuser= await client.fetch_user(int(embed.fields[2].value)) #uses the stored embed user id to obtain the user id of the author of the flagged message
+        await embedMessage.edit(embed=embed)
+    elif label.startswith("Ban"):
+        link=(embedMessage.fields[1].value)
+        linksplit=(embedMessage.fields[1].value).split('/')
+        originalEmbedID = int(re.sub(r'[)]', '', linksplit[6])) #uses the stored embed link to get the message id and channel id of the message that was flagged
+        originalchannel= await client.fetch_channel(int(linksplit[5]))
+        originalmessage = await originalchannel.fetch_message(originalEmbedID)
+        originalUser= await client.fetch_user(int(embedMessage.fields[2].value)) #uses the stored embed user id to obtain the user id of the author of the flagged message
         await originalmessage.delete()
         kickguild = await client.fetch_guild(guild)
-        await kickguild.ban(user=oriuser, reason=(embed.fields[0].value))
+        await kickguild.ban(user=originalUser, reason=(embedMessage.fields[0].value))
         embed = discord.Embed(
 			title=f"Banned by {discorduser}",
 		    colour=discord.Color.red(),
             description=link)
-        await msg.edit(embed=embed)
-        await msg.clear_reactions()
+        await embedMessage.edit(embed=embed)
     else:
         pass
 
