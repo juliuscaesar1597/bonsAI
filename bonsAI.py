@@ -108,7 +108,7 @@ async def on_button_click(interaction):
 async def on_button_click(interaction): #analyzes reactions for the modqueue
     guild= await client.fetch_guild(631730211880435752) #change guild id to match your modqueue guild id
     label = interaction.component.label
-    interactionChannel = client.get_channel(804719360404357140) 
+    interactionChannel = client.get_channel(834778270968446976) 
     interactionUser = interaction.user.id
 
     interactionMessage = await interactionChannel.fetch_message(interaction.message.id)
@@ -136,7 +136,8 @@ async def on_button_click(interaction): #analyzes reactions for the modqueue
 			title=f"Deleted by {discorduser}",
 		    colour=discord.Color.red(),
             description=link)
-        await embedMessage.edit(embed=embed)
+        await lastMessage.edit(embed=embed)
+        await interactionMessage.delete(delay=None)
     elif label.startswith("Kick"):
         link=(embedMessage.fields[1].value)
         linkSplit=(embedMessage.fields[1].value).split('/')
@@ -150,7 +151,8 @@ async def on_button_click(interaction): #analyzes reactions for the modqueue
 			title=f"Kicked by {discorduser}",
 		    colour=discord.Color.red(),
             description=link)
-        await embedMessage.edit(embed=embed)
+        await lastMessage.edit(embed=embed)
+        await interactionMessage.delete(delay=None)
     elif label.startswith("Ban"):
         link=(embedMessage.fields[1].value)
         linksplit=(embedMessage.fields[1].value).split('/')
@@ -158,14 +160,14 @@ async def on_button_click(interaction): #analyzes reactions for the modqueue
         originalchannel= await client.fetch_channel(int(linksplit[5]))
         originalmessage = await originalchannel.fetch_message(originalEmbedID)
         originalUser= await client.fetch_user(int(embedMessage.fields[2].value)) #uses the stored embed user id to obtain the user id of the author of the flagged message
-        await originalmessage.delete()
         kickguild = await client.fetch_guild(guild)
         await kickguild.ban(user=originalUser, reason=(embedMessage.fields[0].value))
         embed = discord.Embed(
 			title=f"Banned by {discorduser}",
 		    colour=discord.Color.red(),
             description=link)
-        await embedMessage.edit(embed=embed)
+        await lastMessage.edit(embed=embed)
+        await interactionMessage.delete(delay=None)
     else:
         pass
 
