@@ -11,13 +11,13 @@ variables:
   azureServiceConnectionId: 'beac8327-165d-4f52-9821-7b8ae1dec84c'
 
   # Web app name
-  webAppName: ''
+  webAppName: 'bonsAI'
 
   # Agent VM image name
   vmImageName: 'ubuntu-latest'
 
   # Environment name
-  environmentName: ''
+  environmentName: 'bonsAI'
 
   # Project root folder. Point to the folder containing manage.py file.
   projectRoot: $(System.DefaultWorkingDirectory)
